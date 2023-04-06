@@ -11,6 +11,5 @@ app.secret_key = 'akjsdnasdnvdk123'
 app.config['SESSION_TYPE'] = 'filesystem'
 
 db = SQLAlchemy(app)
-
 import views
 

@@ -13,8 +13,13 @@ from models import Category, Product
 
 @app.route('/')
 def index():
-    db.create_all()
-    return render_template('index.html')
+    product = Product.query.limit(5).all()
+    category = Category.query.group_by(Category.cat_name).all()
+    el = {
+        'product': product,
+        'category': category
+    }
+    return render_template('index.html', el=el)
 
 
 @app.route('/add_prod', methods=['POST', 'GET'])
@@ -35,10 +40,8 @@ def add_prod():
             return redirect('/')
         except Exception as ex:
             db.session.rollback()
-            print('Error DB!', ex)
-        # finally:
-        #     db.create_all()
-    print('3', categories) #проверка
+            print('error add_product', ex)
+
     return render_template('add_prod.html', categories=categories)
 
 
@@ -53,7 +56,20 @@ def add_cat():
             return redirect('/')
         except Exception as ex:
             db.session.rollback()
+            print('error add_category', ex)
     return render_template('add_cat.html')
 
-#выполнено добавление записи в обе бд
-#не повторяющиеся категории в выпадающем списке
+
+@app.route("/details/<cat_name>", methods=['POST', 'GET'])
+def details(cat_name: str):
+    detail = []
+    products = Product.query.all()
+    for product in products:
+        if product.pr.cat_name == cat_name:
+            detail.append(product)
+    # detail = products.filter_by(cat_name='cat_name')
+    print(products)
+    print(detail)
+    return render_template('details.html', detail=detail)
+
+
