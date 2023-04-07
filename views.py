@@ -13,7 +13,7 @@ from models import Category, Product
 
 @app.route('/')
 def index():
-    product = Product.query.limit(5).all()
+    product = Product.query.all()
     category = Category.query.group_by(Category.cat_name).all()
     el = {
         'product': product,
