@@ -1,5 +1,5 @@
 from sqlite3 import OperationalError
-
+from cloudipsp import Api, Checkout
 from app import app, db
 from flask import (
     render_template,
@@ -20,6 +20,20 @@ def index():
         'category': category
     }
     return render_template('index.html', el=el)
+
+
+@app.route('/buy/<int:id>/')
+def buy(id):
+    item = Product.query.get(id)
+    api = Api(merchant_id=1396424,
+              secret_key='test')
+    checkout = Checkout(api=api)
+    data = {
+        "currency": "BYN",
+        "amount": str(item.price) + "00"
+    }
+    url = checkout.url(data).get('checkout_url')
+    return redirect(url)
 
 
 @app.route('/add_prod', methods=['POST', 'GET'])
@@ -68,8 +82,7 @@ def details(cat_name: str):
         if product.pr.cat_name == cat_name:
             detail.append(product)
     # detail = products.filter_by(cat_name='cat_name')
-    print(products)
-    print(detail)
+
     return render_template('details.html', detail=detail)
 
 
